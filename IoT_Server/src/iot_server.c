@@ -176,10 +176,12 @@ void server_socket_listen(int server_socket, struct sockaddr_in *client_addr, ui
 	// Parse message and print buffer information
 	printf("IOT_SERVER: Received %d-byte datagram from %s:%d\n", (int) recv_len, inet_ntoa(client_addr->sin_addr), ntohs(client_addr->sin_port));
 	// printf("received data: %u %u %u %u %u %u %u %u %u %u\n", buffer_recv[0], buffer_recv[1], buffer_recv[2], buffer_recv[3], buffer_recv[4], buffer_recv[5], buffer_recv[6], buffer_recv[7], buffer_recv[8], buffer_recv[9]);
+	/*
 	int i;
 	for (i = 0; i < recv_len; i++)
 		printf("	>> %u", buffer_recv[i]);
 	printf("\n");
+	*/
 
 	/* Build and send UDP reply to client */
 	uint8_t buffer_reply[DATAGRAM_SIZE] = {"\0"};
@@ -259,17 +261,19 @@ void server_datagram_parsing(uint8_t* buffer_recv) {
 		conversions_16[4] = (uint16_t) (samples_raw[sample][9] << 8 | samples_raw[sample][8]);
 
 		// Convert into percentage-based floating-point numbers.
-		samples_parsed[sample].timestamp = (int) conversions_16[0];
+		samples_parsed[sample].timestamp = (long int) conversions_16[0];
 		samples_parsed[sample].clarity = (float) conversions_16[1] / 655.35;
 		samples_parsed[sample].red = (float) conversions_16[2] / 655.35;
 		samples_parsed[sample].green = (float) conversions_16[3] / 655.35;
 		samples_parsed[sample].blue = (float) conversions_16[4] / 655.35;
 
-		printf("IOT_SERVER: Sample %d from sensor at %d seconds: Clarity %.2f %% - Red: %.2f %% - Green: %.2f %% - Blue: %.2f %% \n",
+		printf("IOT_SERVER: Sample %d from sensor at %ld seconds: Clarity %.2f %% - Red: %.2f %% - Green: %.2f %% - Blue: %.2f %% \n",
 				sample, samples_parsed[sample].timestamp, samples_parsed[sample].clarity, samples_parsed[sample].red, samples_parsed[sample].green, samples_parsed[sample].blue);
 	}
-	printf("\n");
 
+
+
+	printf("\n");
 }
 
 

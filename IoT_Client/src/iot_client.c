@@ -165,11 +165,12 @@ void client_send_data(int client_socket, struct sockaddr_in* server_addr, uint8_
 	ssize_t send_len = sendto(client_socket, buffer_send, buffer_send_len, 0,
 							  (const struct sockaddr *) server_addr, sizeof(*server_addr));
 	printf("IOT_CLIENT: Sent %d-byte datagram to server\n", (int) send_len);
-
+	/*
 	int i;
 	for (i = 0; i < buffer_send_len; i++)
 		printf("	>> %u", buffer_send[i]);
 	printf("\n");
+	*/
 	memset(buffer_send, 0, DATAGRAM_SIZE);
 
 	/* Receive Reply */

@@ -20,7 +20,7 @@
 /* TYPE DEFINITIONS */
 
 typedef struct {
-	int timestamp;
+	long int timestamp;
 	float clarity;
 	float red;
 	float green;
