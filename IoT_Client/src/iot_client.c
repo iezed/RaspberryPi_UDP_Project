@@ -105,6 +105,14 @@ int client_socket_init(struct sockaddr_in* server_addr) {
 		print_error_client(1);
 		exit(EXIT_FAILURE);
 	}
+	/* Timeout socket every 1 second */
+	struct timeval intervals;
+	intervals.tv_sec = 2;
+	intervals.tv_usec = 0;
+	if (setsockopt(client_socket, SOL_SOCKET, SO_RCVTIMEO, &intervals, sizeof(intervals)) < 0) {
+		print_error_client(5);
+		exit(EXIT_FAILURE);
+	}
 	printf("IOT_CLIENT: Initialized client UDP socket (descriptor %d)\n", client_socket);
 
 
@@ -160,26 +168,33 @@ void client_socket_print_info(struct sockaddr_in* sockaddr) {
  */
 void client_send_data(int client_socket, struct sockaddr_in* server_addr, uint8_t* buffer_send, uint8_t* buffer_recv) {
 
-	/* Send Packet to Server */
 	size_t buffer_send_len = (size_t) ((buffer_send[2] << 8) + buffer_send[1]) + DATAGRAM_HEADER_SIZE + 1;
-	ssize_t send_len = sendto(client_socket, buffer_send, buffer_send_len, 0,
-							  (const struct sockaddr *) server_addr, sizeof(*server_addr));
-	printf("IOT_CLIENT: Sent %d-byte datagram to server\n", (int) send_len);
-	/*
-	int i;
-	for (i = 0; i < buffer_send_len; i++)
-		printf("	>> %u", buffer_send[i]);
-	printf("\n");
-	*/
-	memset(buffer_send, 0, DATAGRAM_SIZE);
 
-	/* Receive Reply */
+	ssize_t recv_len = -1;
+	while (recv_len < 0) {
 
-	struct sockaddr_in server_reply_addr;
-	memset(&server_reply_addr, 0, sizeof(server_reply_addr));
-	socklen_t server_reply_addr_len = sizeof(server_reply_addr);
-	ssize_t recv_len = recvfrom(client_socket, buffer_recv, DATAGRAM_SIZE, 0, (struct sockaddr *) &server_reply_addr, &server_reply_addr_len);
+		/* Send Packet to Server */
+		ssize_t send_len = sendto(client_socket, buffer_send, buffer_send_len, 0, (const struct sockaddr *) server_addr, sizeof(*server_addr));
+		printf("IOT_CLIENT: Sent %d-byte datagram to server\n", (int) send_len);
+		/*
+		int i;
+		for (i = 0; i < buffer_send_len; i++)
+			printf("	>> %u", buffer_send[i]);
+		printf("\n");
+		*/
+
+
+		/* Receive Reply */
+
+		struct sockaddr_in server_reply_addr;
+		memset(&server_reply_addr, 0, sizeof(server_reply_addr));
+		socklen_t server_reply_addr_len = sizeof(server_reply_addr);
+
+		recv_len = recvfrom(client_socket, buffer_recv, DATAGRAM_SIZE, 0, (struct sockaddr *) &server_reply_addr, &server_reply_addr_len);
+	}
+
 	printf("IOT_CLIENT: Received %d-byte reply from server\n\n", (int) recv_len);
+	memset(buffer_send, 0, DATAGRAM_SIZE);
 
 	// printf("IOT_CLIENT: Message sent to			: %lld\n", (unsigned long long int) ntohl(server_reply_addr.sin_addr.s_addr));
 	// printf("IOT_CLIENT: Reply received from		: %lld\n", (unsigned long long int) ntohl(server_addr->sin_addr.s_addr));
@@ -275,6 +290,9 @@ void print_error_client(int error_code) {
 	switch(error_code) {
 		case 1:
 			printf(">> Could not open file descriptor for socket.\n");
+			break;
+		case 5:
+			printf(">> Could not set timeout for socket file descriptor.\n\n");
 			break;
 		case 2:
 			printf(">> Could not bind address to socket.\n");

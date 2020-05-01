@@ -19,12 +19,14 @@
 #define SERVER_ADDR_32T				0xC0A80143 // 192.168.1.67
 
 // Communication parameters
-#define DATAGRAM_SIZE				1024
-#define DATAGRAM_HEADER_SIZE		3	// Request Type (1B) + Message Size (2B)
-#define DATAGRAM_SAMPLE_SIZE		10	// 2 timestamp bytes + 8 data bytes
-#define MAX_SAMPLING_RATIO			DATAGRAM_SIZE / DATAGRAM_SAMPLE_SIZE
-#define DEFAULT_RATE_SAMPLING		1
-#define DEFAULT_RATE_SERVER_STREAM	10
+#define DATAGRAM_SIZE					1024
+#define DATAGRAM_HEADER_SIZE			3	// Request Type (1B) + Message Size (2B)
+#define DATAGRAM_SAMPLE_SIZE			10	// 2 timestamp bytes + 8 data bytes
+#define MAX_SAMPLING_RATIO				DATAGRAM_SIZE / DATAGRAM_SAMPLE_SIZE
+#define DEFAULT_RATE_SAMPLING			1
+#define DEFAULT_RATE_SERVER_STREAM		10
+#define DEFAULT_RATE_SERVER_STATS_CALC	60
+#define MAX_RATE_SERVER_STATS_CALC		600
 
 // Protocol data codes
 #define DATAGRAM_REQ_COMM				0x01
@@ -40,6 +42,7 @@
 typedef struct {
     int sampling;
     int server_stream;
+    int server_stats_calc;
 } timing_rates;
 
 

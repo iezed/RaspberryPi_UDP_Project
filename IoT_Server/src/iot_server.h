@@ -9,13 +9,6 @@
 #include "iot_lib.h"
 
 
-/* MACROS & CONSTANTS */
-
-#define TCS34725_SAMPLE_SIZE	8
-
-
-
-
 
 /* TYPE DEFINITIONS */
 
@@ -29,10 +22,10 @@ typedef struct {
 
 
 typedef struct {
-    int minimum;
-    int mean;
-    int maximum;
-} sensor_statistics;
+    float minimum;
+    float mean;
+    float maximum;
+} server_stats;
 
 
 
@@ -40,11 +33,14 @@ typedef struct {
 
 // IoT Server Module
 void		parse_param_rates			(timing_rates* rates, int argc, char* argv[]);
-int			server_socket_init			(struct sockaddr_in* server_addr);
+int			server_socket_init			(struct sockaddr_in* server_addr, struct timeval *intervals);
 void		server_socket_print_info	(struct sockaddr_in* sockaddr);
-void		server_socket_listen		(int server_socket, struct sockaddr_in* client_addr, uint8_t* buffer_recv, timing_rates* timings);
-void 		server_build_reply			(int server_socket, struct sockaddr_in* client_addr, uint8_t* buffer_recv, uint8_t* buffer_reply, timing_rates* timings);
-void 		server_datagram_parsing		(uint8_t* data_in); // float data_out[][4]
+int			server_socket_listen		(int server_socket, struct sockaddr_in *client_addr, int comm_established_flag, int server_stats_timeout, int *stats_secs, uint8_t* buffer_recv);
+void 		server_socket_reply			(int server_socket, struct sockaddr_in *client_addr, uint8_t* buffer_recv, timing_rates* timings);
+void 		server_build_reply			(int server_socket, uint8_t* buffer_recv, uint8_t* buffer_reply, timing_rates* timings);
+int 		server_datagram_parsing		(uint8_t* data_in, sample_data* data_out);
+void		server_save_samples			(sample_data* samples_stream, int n_samples, sample_data* samples_all, int* samples_all_index);
+void		server_compute_stats		(sample_data* samples_all, int* samples_all_index, server_stats* stats);
 
 
 // Error Control
