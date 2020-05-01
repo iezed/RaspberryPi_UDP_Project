@@ -100,8 +100,7 @@ void tcs34725_read(int fd_i2c, uint8_t* data) {
 	// usleep((integration_time_secs + waiting_time_secs) * 1000);		// We are to wait the amount of time defined as integration time + waiting time
 
 
-	printf("COLOR_SENSOR: TCS - read sequence begun.\n");
-
+	// printf("COLOR_SENSOR: TCS - read sequence begun.\n");
 	read_ptr_reg = TCS_CMD_BYTE | TCS_REG_DATA_C_LOW; // TCS_CMD_AUTOINC | TCS_REG_DATA_C_LOW;
 	int i;
 	for (i = 0; i < TCS34725_SAMPLE_SIZE; i++) {
@@ -117,8 +116,7 @@ void tcs34725_read(int fd_i2c, uint8_t* data) {
 		// Increase read pointer register
 		read_ptr_reg++;
 	}
-
-	printf("COLOR_SENSOR: TCS - read sequence done:\n");
+	// printf("COLOR_SENSOR: TCS - read sequence done:\n");
 
 }
 

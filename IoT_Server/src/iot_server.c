@@ -68,9 +68,12 @@ int main(int argc, char* argv[]) {
 
 		/* STEP 5 - For stats timeout, compute statistics for current data */
 
-		else {
+		else if (samples_all_index > 0) {
 			stats_secs = 0;
 			server_compute_stats(samples_all, &samples_all_index, &stats);
+		} else {
+			stats_secs = 0;
+			printf("IOT_SERVER: No samples to compute statistics\n");
 		}
 
 
@@ -310,7 +313,7 @@ void server_build_reply(int server_socket, uint8_t* buffer_recv, uint8_t* buffer
 // float data_out[][4]
 int server_datagram_parsing(uint8_t* buffer_recv, sample_data* data_out) {
 
-	int n_samples = (int) ((buffer_recv[2] << 8) | (buffer_recv[1])) / 8;
+	int n_samples = (int) ((buffer_recv[2] << 8) | (buffer_recv[1])) / DATAGRAM_SAMPLE_SIZE;
 
 	uint8_t	samples_raw	[n_samples][DATAGRAM_SAMPLE_SIZE];
 
